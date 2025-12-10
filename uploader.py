@@ -218,28 +218,11 @@ class FrameGrabber:
         self.latest_frame = None
         self.lock = threading.Lock()
         self.running = True
-
-        if self.camera_type == 'PICAM':
-            if not PICAMERA_AVAILABLE:
-                raise ImportError("picamera2 is not available")
-            self.picam = Picamera2()
-            config = self.picam.create_video_configuration(main={"size": (width, height)})
-            self.picam.configure(config)
-            self.picam.start()
-            logger.info(f"PiCamera initialized at {width}x{height}")
-        else:
-            backend = OPENCV_BACKEND if camera_type == 'USB' else cv2.CAP_ANY
-            self.cap = cv2.VideoCapture(src, backend)
-            if not self.cap.isOpened():
-                logger.error(f"Failed to open video source: {src}")
-                raise IOError("Camera open failed")
-            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-            actual_w = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-            actual_h = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            logger.info(f"Requested {width}x{height} | Actual {actual_w}x{actual_h}")
-
+        self.consecutive_failures = 0
+        self.failure_threshold = 10  # Trigger restart after 10 failed reads (~1-2 seconds if sleeping 0.1s)
+        
+        self._initialize_camera(src, width, height)
+        
         # Warm-up
         logger.info("Warming up camera...")
         for _ in range(warm_up_frames):
@@ -250,6 +233,27 @@ class FrameGrabber:
         self.thread.start()
         logger.info("FrameGrabber thread started")
 
+    def _initialize_camera(self, src, width, height):
+        if self.camera_type == 'PICAM':
+            if not PICAMERA_AVAILABLE:
+                raise ImportError("picamera2 is not available")
+            self.picam = Picamera2()
+            config = self.picam.create_video_configuration(main={"size": (width, height)})
+            self.picam.configure(config)
+            self.picam.start()
+            logger.info(f"PiCamera initialized at {width}x{height}")
+        else:
+            backend = OPENCV_BACKEND if self.camera_type == 'USB' else cv2.CAP_ANY
+            self.cap = cv2.VideoCapture(src, backend)
+            if not self.cap.isOpened():
+                raise IOError(f"Failed to open video source: {src}")
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            actual_w = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            actual_h = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            logger.info(f"Requested {width}x{height} | Actual {actual_w}x{actual_h}")
+
     def _read_frame(self):
         if self.camera_type == 'PICAM':
             return self.picam.capture_array()
@@ -257,26 +261,61 @@ class FrameGrabber:
             ret, frame = self.cap.read()
             return frame if ret else None
 
+    def _reopen_camera(self, src, width, height):
+        logger.info("Attempting to reopen camera...")
+        if self.camera_type == 'PICAM':
+            self.picam.stop()
+            self.picam.close()  # Ensure clean close
+        else:
+            self.cap.release()
+        time.sleep(1)  # Give hardware time to settle
+        self._initialize_camera(src, width, height)
+        self.consecutive_failures = 0
+
     def _update(self):
         while self.running:
-            frame = self._read_frame()
-            if frame is not None:
-                with self.lock:
-                    self.latest_frame = frame.copy()
-            else:
-                logger.warning("Failed to read frame - retrying...")
-                time.sleep(0.1)
-
+            try:
+                if self.camera_type != 'PICAM' and not self.cap.isOpened():
+                    raise IOError("Camera capture is not opened")
+                
+                frame = self._read_frame()
+                if frame is not None:
+                    with self.lock:
+                        self.latest_frame = frame.copy()
+                    self.consecutive_failures = 0
+                else:
+                    raise ValueError("Frame read returned None")
+            except Exception as e:
+                self.consecutive_failures += 1
+                logger.warning(f"Frame read failed ({self.consecutive_failures}/{self.failure_threshold}): {e}")
+                if self.consecutive_failures >= self.failure_threshold:
+                    try:
+                        self._reopen_camera(video_src, camera_width, camera_height)
+                    except Exception as reopen_e:
+                        logger.error(f"Reopen failed: {reopen_e} - retrying after delay")
+                        time.sleep(5)  # Longer backoff for reopen failures
+                else:
+                    time.sleep(0.1)
+    
     def get_latest_frame(self):
         with self.lock:
-            return self.latest_frame.copy() if self.latest_frame is not None else None
+            frame = self.latest_frame.copy() if self.latest_frame is not None else None
+        if frame is not None:
+            # Optional: Check for black frame (mean intensity < 5)
+            if np.mean(frame) < 5:
+                logger.warning("Detected potential black frame - treating as invalid")
+                return None
+        return frame
 
     def stop(self):
         self.running = False
         if self.camera_type == 'PICAM':
-            self.picam.stop()
+            if hasattr(self, 'picam'):
+                self.picam.stop()
+                self.picam.close()
         else:
-            self.cap.release()
+            if hasattr(self, 'cap'):
+                self.cap.release()
 
 grabber = FrameGrabber(video_src, camera_width, camera_height, camera_type)
 logger.info(f"Using {camera_type} camera at {camera_width}x{camera_height}")
@@ -288,16 +327,30 @@ def brighten_frame(frame, gamma):
     return cv2.LUT(frame, table)
 
 # --------------------- Capture and Upload ---------------------
+@tenacity.retry(stop=tenacity.stop_after_attempt(5), wait=tenacity.wait_exponential(multiplier=1, min=2, max=10), reraise=True)
+def restart_grabber():
+    global grabber
+    grabber.stop()
+    time.sleep(1)
+    grabber = FrameGrabber(video_src, camera_width, camera_height, camera_type)
+
 def capture_and_upload():
     global grabber
     frame = grabber.get_latest_frame()
     if frame is None:
         logger.warning("No fresh frame available - recovering camera...")
-        grabber.stop()
-        time.sleep(1)
-        grabber = FrameGrabber(video_src, camera_width, camera_height, camera_type)
-        return
-
+        try:
+            restart_grabber()
+            # After restart, try to grab a new frame immediately
+            time.sleep(0.5)  # Short wait for warm-up
+            frame = grabber.get_latest_frame()
+            if frame is None:
+                logger.error("Recovery failed - skipping upload")
+                return
+        except Exception as e:
+            logger.error(f"Camera recovery failed after retries: {e}")
+            return  # Don't crash the script
+    
     frame = brighten_frame(frame, gamma)
     logger.info(f"Frame captured - shape: {frame.shape}")
     try:
@@ -403,5 +456,14 @@ signal.signal(signal.SIGTERM, shutdown_handler)
 
 # --------------------- Main Loop ---------------------
 logger.info("All components initialized. Waiting for MQTT triggers...")
+last_health_check = time.time()
+health_check_interval = 30  # seconds
+
 while True:
     time.sleep(1)
+    if time.time() - last_health_check > health_check_interval:
+        frame = grabber.get_latest_frame()
+        if frame is None:
+            logger.info("Periodic health check failed - triggering recovery")
+            capture_and_upload()  # Reuse the function (it won't upload, just recover)
+        last_health_check = time.time()
