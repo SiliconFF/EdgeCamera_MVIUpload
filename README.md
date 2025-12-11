@@ -94,8 +94,7 @@ that was encounted please see the flow chart below:
 [Chart to be added later]
 
 
-This issue gave me the idea to implement an interface to upload photos to "Image Folder" devices on the MVI Edge. This has been proven to vastly improve the time sync from sometimes 
-being off by upwards of 4s to being within ~200ms. The main design goal is to give the integrators of MVI Edge more flexibility with what cameras they can use and to deal with networking
+This issue gave me the idea to implement an interface to upload photos taken on an edge device (like a raspberrypi) connected to the camera to "Image Folder" devices on the MVI Edge. With this implmentation the compute overhead in the MVI server is reduced and has been tested to vastly improve the time sync from sometimes being off by upwards of 4s to being within ~200ms. The main design goal is to give the integrators of MVI Edge more flexibility with what cameras they can use and to deal with networking
 and financial restrictions on equipment usage.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
