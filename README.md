@@ -191,7 +191,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the project_license. See `LICENSE.txt` for more information.
+Distributed under the project_license. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -218,7 +218,7 @@ Project Link: [https://github.com/SiliconFF/EdgeCamera_MVIUpload](https://github
 [issues-shield]: https://img.shields.io/github/issues/SiliconFF/EdgeCamera_MVIUpload.svg?style=for-the-badge
 [issues-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues
 [license-shield]: https://img.shields.io/github/license/SiliconFF/EdgeCamera_MVIUpload.svg?style=for-the-badge
-[license-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/blob/master/LICENSE.txt
+[license-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/collin-finetti
 [product-screenshot]: images/project_logo.jpg
