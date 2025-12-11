@@ -30,7 +30,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/github_username/repo_name">
+  <a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload">
     <img src="images/logo.jpg" alt="Logo" width="200" height="200">
   </a>
 
@@ -40,10 +40,10 @@
     Turn any computer into a lightweight edge camera that can upload directly to an MVI Edge device 
     eliminating time synchronization issues that can occur with large networks and RTSP streams.
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
+    <a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload">View Demo</a>
     &middot;
     <a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
@@ -119,7 +119,7 @@ This is an example of how to list things you need to use the software and how to
 1. Get a free API Key at [https://example.com](https://example.com)
 2. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/SiliconFF/EdgeCamera_MVIUpload.git
    ```
 3. Install NPM packages
    ```sh
@@ -131,7 +131,7 @@ This is an example of how to list things you need to use the software and how to
    ```
 5. Change git remote url to avoid accidental pushes to base project
    ```sh
-   git remote set-url origin github_username/repo_name
+   git remote set-url origin SiliconFF/EdgeCamera_MVIUpload
    git remote -v # confirm the changes
    ```
 
