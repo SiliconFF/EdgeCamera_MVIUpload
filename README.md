@@ -201,13 +201,9 @@ Distributed under the project_license. See `LICENSE.txt` for more information.
 
 Collin Finetti - finetticj@gmail.com
 
-Project Link: [https://github.com/github_username/repo_name](https://github.com/SiliconFF/EdgeCamera_MVIUpload)
+Project Link: [https://github.com/SiliconFF/EdgeCamera_MVIUpload](https://github.com/SiliconFF/EdgeCamera_MVIUpload)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
