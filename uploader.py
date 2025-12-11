@@ -46,7 +46,7 @@ logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] %(message)s',
     handlers=[
         logging.StreamHandler(),
-        RotatingFileHandler('uploader.log', maxBytes=1024 * 1024 * 5, backupCount=1) # 5 MB max size, keep 5 backups
+        RotatingFileHandler('uploader.log', maxBytes=1024 * 1024 * 5, backupCount=1)
     ]
 )
 logger = logging.getLogger(__name__)
@@ -221,7 +221,7 @@ class FrameGrabber:
         self.lock = threading.Lock()
         self.running = True
         self.consecutive_failures = 0
-        self.failure_threshold = 10  # Trigger restart after 10 failed reads (~1-2 seconds if sleeping 0.1s)
+        self.failure_threshold = 10
         
         self._initialize_camera(src, width, height)
         
@@ -268,10 +268,10 @@ class FrameGrabber:
         logger.info("Attempting to reopen camera...")
         if self.camera_type == 'PICAM':
             self.picam.stop()
-            self.picam.close()  # Ensure clean close
+            self.picam.close()
         else:
             self.cap.release()
-        time.sleep(1)  # Give hardware time to settle
+        time.sleep(1)
         self._initialize_camera(src, width, height)
         self.consecutive_failures = 0
 
@@ -296,7 +296,7 @@ class FrameGrabber:
                         self._reopen_camera(video_src, camera_width, camera_height)
                     except Exception as reopen_e:
                         logger.error(f"Reopen failed: {reopen_e} - retrying after delay")
-                        time.sleep(5)  # Longer backoff for reopen failures
+                        time.sleep(5)
                 else:
                     time.sleep(0.1)
     
@@ -304,7 +304,6 @@ class FrameGrabber:
         with self.lock:
             frame = self.latest_frame.copy() if self.latest_frame is not None else None
         if frame is not None:
-            # Optional: Check for black frame (mean intensity < 5)
             if np.mean(frame) < 5:
                 logger.warning("Detected potential black frame - treating as invalid")
                 return None
@@ -329,32 +328,50 @@ def brighten_frame(frame, gamma):
     table = np.array([((i / 255.0) ** inv_gamma) * 255 for i in np.arange(256)]).astype("uint8")
     return cv2.LUT(frame, table)
 
-# --------------------- Capture and Upload ---------------------
+# --------------------- New: Dedicated Recovery Function ---------------------
 @tenacity.retry(stop=tenacity.stop_after_attempt(5), wait=tenacity.wait_exponential(multiplier=1, min=2, max=10), reraise=True)
-def restart_grabber():
+def recover_camera_connection():
+    """Restart the FrameGrabber to recover camera connection. No capture/upload."""
     global grabber
+    logger.info("Recovering camera connection by restarting grabber...")
     grabber.stop()
     time.sleep(1)
     grabber = FrameGrabber(video_src, camera_width, camera_height, camera_type)
+    logger.info("Camera connection recovered successfully")
 
-def capture_and_upload():
-    global grabber
+# --------------------- New: Clean Frame Capture Function ---------------------
+def capture_frame():
+    """
+    Get a valid frame. If none available, attempt recovery first.
+    Returns frame or None on failure.
+    """
     frame = grabber.get_latest_frame()
-    if frame is None:
-        logger.warning("No fresh frame available - recovering camera...")
-        try:
-            restart_grabber()
-            # After restart, try to grab a new frame immediately
-            time.sleep(0.5)  # Short wait for warm-up
-            frame = grabber.get_latest_frame()
-            if frame is None:
-                logger.error("Recovery failed - skipping upload")
-                return
-        except Exception as e:
-            logger.error(f"Camera recovery failed after retries: {e}")
-            return  # Don't crash the script
+    if frame is not None:
+        return frame
     
-    #frame = brighten_frame(frame, gamma)
+    logger.warning("No fresh frame available - attempting recovery...")
+    try:
+        recover_camera_connection()
+        time.sleep(0.5)  # Allow new grabber to produce frames
+        frame = grabber.get_latest_frame()
+        if frame is None:
+            logger.error("Recovery succeeded but no valid frame yet")
+            return None
+        return frame
+    except Exception as e:
+        logger.error(f"Camera recovery failed after retries: {e}")
+        return None
+
+# --------------------- Updated: Capture and Upload (MQTT Trigger Only) ---------------------
+def capture_and_upload():
+    frame = capture_frame()
+    if frame is None:
+        logger.error("Failed to obtain a valid frame - skipping upload")
+        return
+    
+    # Optional gamma correction
+    # frame = brighten_frame(frame, gamma)
+    
     logger.info(f"Frame captured - shape: {frame.shape}")
     try:
         upload_frame_in_memory(frame, device_endpoint)
@@ -457,7 +474,7 @@ def shutdown_handler(signum, frame):
 signal.signal(signal.SIGINT, shutdown_handler)
 signal.signal(signal.SIGTERM, shutdown_handler)
 
-# --------------------- Main Loop ---------------------
+# --------------------- Main Loop (Health Check - Recovery Only) ---------------------
 logger.info("All components initialized. Waiting for MQTT triggers...")
 last_health_check = time.time()
 health_check_interval = 30  # seconds
@@ -467,6 +484,9 @@ while True:
     if time.time() - last_health_check > health_check_interval:
         frame = grabber.get_latest_frame()
         if frame is None:
-            logger.info("Periodic health check failed - triggering recovery")
-            capture_and_upload()  # Reuse the function (it won't upload, just recover)
+            logger.info("Periodic health check failed - recovering camera (no upload)")
+            try:
+                recover_camera_connection()
+            except Exception as e:
+                logger.error(f"Health check recovery failed: {e}")
         last_health_check = time.time()
