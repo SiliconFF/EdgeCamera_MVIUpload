@@ -44,9 +44,9 @@
     <br />
     <a href="https://github.com/github_username/repo_name">View Demo</a>
     &middot;
-    <a href="https://github.com/SiliconFF/EdgeCamera_MVIUploadissues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
-    <a href="https://github.com/SiliconFF/EdgeCamera_MVIUploadissues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -157,7 +157,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [ ] Feature 3
     - [ ] Nested Feature
 
-See the [open issues](https://github.com/SiliconFF/EdgeCamera_MVIUploadissues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -181,7 +181,7 @@ Don't forget to give the project a star! Thanks again!
 
 ### Top contributors:
 
-<a href="https://github.com/SiliconFF/EdgeCamera_MVIUploadgraphs/contributors">
+<a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=github_username/repo_name" alt="contrib.rocks image" />
 </a>
 
@@ -213,15 +213,15 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
-[contributors-url]: https://github.com/SiliconFF/EdgeCamera_MVIUploadgraphs/contributors
+[contributors-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
-[forks-url]: https://github.com/SiliconFF/EdgeCamera_MVIUploadnetwork/members
+[forks-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/network/members
 [stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
-[stars-url]: https://github.com/SiliconFF/EdgeCamera_MVIUploadstargazers
+[stars-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/stargazers
 [issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
-[issues-url]: https://github.com/SiliconFF/EdgeCamera_MVIUploadissues
+[issues-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues
 [license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/SiliconFF/EdgeCamera_MVIUploadblob/master/LICENSE.txt
+[license-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/collin-finetti
 [product-screenshot]: images/project_logo.jpg
