@@ -32,7 +32,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload">
-    <img src="images/logo.jpg" alt="Logo" width="200" height="200">
+    <img src="images/logo.png" alt="Logo" width="200" height="200">
   </a>
 
 <h3 align="center">MVI Butterfly</h3>
@@ -222,7 +222,7 @@ Project Link: [https://github.com/SiliconFF/EdgeCamera_MVIUpload](https://github
 [license-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/collin-finetti
-[product-screenshot]: images/project_logo.jpg
+[product-screenshot]: images/project_logo.png
 
 <!-- Shields.io badges. You can a comprehensive list with many more badges at: https://github.com/inttter/md-badges -->
 [Python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
