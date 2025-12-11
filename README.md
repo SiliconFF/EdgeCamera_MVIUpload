@@ -23,7 +23,8 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![project_license][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)][linkedin-url]
+
 
 
 
@@ -31,10 +32,10 @@
 <br />
 <div align="center">
   <a href="https://github.com/SiliconFF/EdgeCamera_MVIUpload">
-    <img src="images/logo.jpg" alt="Logo" width="200" height="200">
+    <img src="images/logo.png" alt="Logo" width="200" height="200">
   </a>
 
-<h3 align="center">MVI Butterfly</h3>
+<h3 align="center">MVI Dragonfly</h3>
 
   <p align="center">
     Turn any computer into a lightweight edge camera that can upload directly to an MVI Edge device 
@@ -86,10 +87,7 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started. To avoid retyping too much info, do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`, `project_license`
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 ### Built With
@@ -152,11 +150,14 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 <!-- ROADMAP -->
 ## Roadmap
+- [ ] Add YAML schema 
+- [ ] Verify functionality with RPI CSI modules
+- [ ] Allow multiple devices to be set as a target
+    - [ ] Devices can be linked to different trigger MQTT topics for more comprehensive coverage   
+- [ ] Develop a supervisor webserver for management and config changes
+- [ ] Support for reading from GigE cameras
+- [ ] Prebuilt RPI install script to automatically configure a raspberry pi to be deployed
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
 
 See the [open issues](https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues) for a full list of proposed features (and known issues).
 
@@ -191,7 +192,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the project_license. See `LICENSE.txt` for more information.
+Distributed under the project_license. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -218,10 +219,10 @@ Project Link: [https://github.com/SiliconFF/EdgeCamera_MVIUpload](https://github
 [issues-shield]: https://img.shields.io/github/issues/SiliconFF/EdgeCamera_MVIUpload.svg?style=for-the-badge
 [issues-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues
 [license-shield]: https://img.shields.io/github/license/SiliconFF/EdgeCamera_MVIUpload.svg?style=for-the-badge
-[license-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/blob/master/LICENSE.txt
+[license-url]: https://github.com/SiliconFF/EdgeCamera_MVIUpload/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/collin-finetti
-[product-screenshot]: images/project_logo.jpg
+[product-screenshot]: images/project_logo.png
 
 <!-- Shields.io badges. You can a comprehensive list with many more badges at: https://github.com/inttter/md-badges -->
 [Python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
