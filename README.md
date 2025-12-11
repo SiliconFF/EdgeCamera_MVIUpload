@@ -23,7 +23,8 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![project_license][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)][linkedin-url]
+
 
 
 
