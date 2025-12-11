@@ -100,6 +100,7 @@ mvi_password = os.environ.get('MVI_PASSWORD', config.get('mvi-password', '').str
 
 # MVI Config
 mvi_endpoint_base = config.get('mvi-edge-endpoint', '').strip()
+mvi_device_uuid = config.get('mvi-device-uuid', '').strip()
 if not mvi_endpoint_base or not mvi_username or not mvi_password:
     logger.error("Missing MVI endpoint or credentials")
     sys.exit(1)
@@ -153,7 +154,7 @@ if camera_type == 'RTSP':
 
 # --------------------- Authentication ---------------------
 session_url = f"https://{mvi_endpoint_base}/users/sessions"
-device_endpoint = f"https://{mvi_endpoint_base}/devices/images?uuid=16c02770-ca42-4404-b9b4-f07419414f4d"
+device_endpoint = f"https://{mvi_endpoint_base}/devices/images?uuid={mvi_device_uuid}"
 keep_alive_url = f"https://{mvi_endpoint_base}/users/sessions/keepalive"
 
 @tenacity.retry(stop=tenacity.stop_after_attempt(5), wait=tenacity.wait_exponential(multiplier=1, min=4, max=10))
