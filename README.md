@@ -37,7 +37,8 @@
 <h3 align="center">MVI Butterfly</h3>
 
   <p align="center">
-    project_description
+    Turn any computer into a lightweight edge camera that can upload directly to an MVI Edge device 
+    eliminating time synchronization issues that can occur with large networks and RTSP streams.
     <br />
     <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
     <br />
