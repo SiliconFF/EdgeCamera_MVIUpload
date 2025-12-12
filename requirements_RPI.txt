@@ -1,0 +1,11 @@
+numpy>2
+opencv_contrib_python
+opencv_python
+opencv_python_headless
+paho_mqtt
+picamera2
+PyYAML
+Requests
+tenacity
+urllib3
+watchdog
