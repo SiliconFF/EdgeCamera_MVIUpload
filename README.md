@@ -27,7 +27,6 @@
 
 
 
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
@@ -35,7 +34,7 @@
     <img src="images/logo.png" alt="Logo" width="200" height="200">
   </a>
 
-<h3 align="center">MVI Dragonfly</h3>
+<h3 align="center">MVI-Dragonfly</h3>
 
   <p align="center">
     Turn any computer into a lightweight edge camera that can upload directly to an MVI Edge device 
@@ -82,12 +81,31 @@
 
 
 
+## Disclaimer
+*MVI is a trademark of International Business Machines Corporation.*
+
+MVI-Dragonfly is an independent open-source project and is not affiliated with, endorsed by, or supported by IBM.
+
+
+
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<!--![Product Name Screen Shot][product-screenshot]](https://example.com)-->
+
+For some backstory on this project. I have been implementing applications in assembly processes that use IBM MVI Edge to run quality inspection and object detection models. 
+The single biggest hurdle that was encountered was the syncronizaiton of the time of trigger and the time of the RTSP frame that was captured. To more clearly layout the issue 
+that was encounted please see the chart below:
+
+<img width="751" height="433" alt="rtspjitter" src="https://github.com/user-attachments/assets/634871c1-31af-4742-a2d5-4156c6700218" />  
+<br><br/>
+This chart shows the jitter of time difference between the rtsp timeline and the realworld timeline which when triggering MVI-Edge will cause there to be a discrepency. While there are tools in the MVI-Edge capture settings 
+such as visual trigger and trigger orchestrations these are mostly bandaids for the greater issue.
+<br><br/>
+This issue gave me the idea to implement an interface to upload photos taken on an edge device (like a raspberrypi) connected to the camera to "Image Folder" devices on the MVI Edge. With this implmentation the compute overhead in the MVI server is reduced and has been tested to vastly improve the time sync from sometimes being off by upwards of 4s to being within ~200ms. The main design goal is to give the integrators of MVI Edge more flexibility with what cameras they can use and to deal with networking and financial restrictions on equipment usage.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 
 ### Built With
@@ -101,37 +119,71 @@
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Below are the steps needed to deploy and run MVI-Dragonfly with any device
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
+This program is built entirely on Python3.9 and it is recommended that you create a virtual environment
+
   ```sh
-  npm install npm@latest -g
+  python -m venv [your_virtual_env_name]
   ```
+**Then activate the virtual environment:**
+
+  _Windows_
+  ```sh
+  .\[your_virtual_env_name]\Scripts\activate
+  ```
+  
+  _Linux/RPI_
+  ```sh
+  source ./[your_virtual_env_name]/bin/activate
+  ```
+
+
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo
    ```sh
    git clone https://github.com/SiliconFF/EdgeCamera_MVIUpload.git
    ```
-3. Install NPM packages
+2. Navigate to the new directory
    ```sh
-   npm install
+   cd ./EdgeCamera_MVIUpload
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-5. Change git remote url to avoid accidental pushes to base project
+3. Install the required packages
    ```sh
-   git remote set-url origin SiliconFF/EdgeCamera_MVIUpload
-   git remote -v # confirm the changes
+   pip install -r requirements.txt
    ```
+4. Configure your camera_edge_config.yaml (this file must be named identically and in the same directory as uploader.py)    
+
+  There is a sample yaml available ([sample_camera_edge_config.yaml](https://github.com/SiliconFF/EdgeCamera_MVIUpload/blob/main/sample_camera_edge_config.yaml))
+  
+  ```yaml
+  #MVI Config
+  mvi-edge-endpoint: "ExampleDomain:443/api/v1" #MVI Edge Endpoint
+  mvi-username: "your_username"
+  mvi-password: "your_password"
+  mvi-device-uuid: "your_target_MVI_device_UUID" #Device UUID found in MVI Portal
+  
+  
+  #MQTT Config
+  mqtt-broker: "BrokerDomain" #Could be the same as MVI edge domain if you are using on board broker
+  mqtt-port: 8883 #Use 8883 for TLS, 1883 for non-TLS
+  mqtt-tls-required: True
+  mqtt-tls-file-name: "yourcertificatefile.crt"
+  mqtt-trigger-topic: "Your/Trigger/Topic"
+  
+  #Camera Config
+  camera-type: "USB" #RTSP, USB, or PICAM
+  camera-ip: "" #Must Include the rtsp:// prefix for RTSP cameras and the full stream path
+  camera-width: "1920" 
+  camera-height: "1080"
+  
+  #General
+  host-platform: "WINDOWS" #Valid options are WINDOWS, LINUX, or RPI
+  ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -140,9 +192,26 @@ This is an example of how to list things you need to use the software and how to
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Once you have completed the prerequuisites and installation steps you simply have to plug in your camera and with your virtual env active run the following in the root directory:
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+```sh
+python .\uploader.py
+```
+
+The system will immediately validate your config settings and attempt to connect to your MVI-Edge, MQTT broker, and camera. Operational logs can be found in the automatically generated `uploader.log` in the root directory
+
+**_It is highly recommended to set the script to run on startup which the steps vary depending on your environment_**
+
+
+
+### Example Scenario:
+
+RTSP streaming in MVI Edge exhibits poor time synchronization between the photo capture request and the actual frame capture in real time. This issue is particularly problematic for time-sensitive applications, such as processes that wait for inspection completion or involve moving objects.
+To address this, consider one of the following alternatives:
+
+Connect the RTSP camera directly to a single-board computer (e.g., Raspberry Pi) or use a different camera interface, such as CSI or USB. (There are plans to add GigE support though this seems overkill for this application)
+
+These options allow connection to your MVI Edge instance with continuous frame capture. The system will wait for a message on a designated MQTT trigger topic of your choice. Upon receiving the message, a frame is captured and uploaded to your specified image folder for inspection.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -150,7 +219,6 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 <!-- ROADMAP -->
 ## Roadmap
-- [ ] Add YAML schema 
 - [ ] Verify functionality with RPI CSI modules
 - [ ] Allow multiple devices to be set as a target
     - [ ] Devices can be linked to different trigger MQTT topics for more comprehensive coverage   
@@ -163,7 +231,10 @@ See the [open issues](https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues) 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Acknowledgements
 
+Thanks to IBM for the Maximo Visual Inspection Edge API that powers this project. [Access you MVI-Edge Swagger](https://www.ibm.com/docs/en/masv-and-l/maximo-vi/cd?topic=o-rest-apis) Page to learn more
+This project is unofficial and not endorsed by IBM.
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -192,15 +263,11 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the project_license. See `LICENSE` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
+Distributed under the MIT License. See [`LICENSE`]([license-url]) for more information.
 
 
 <!-- CONTACT -->
 ## Contact
-
 Collin Finetti - finetticj@gmail.com
 
 Project Link: [https://github.com/SiliconFF/EdgeCamera_MVIUpload](https://github.com/SiliconFF/EdgeCamera_MVIUpload)
