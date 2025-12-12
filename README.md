@@ -123,7 +123,7 @@ If you just want to go straight to running the script this is just the steps to 
 git clone https://github.com/SiliconFF/MVI-Dragonfly.git
 cd MVI-Dragonfly
 python -m venv venv && source venv/bin/activate   # or .\venv\Scripts\activate on Windows
-pip install -r requirements.txt
+pip install -r requirements_RPI.txt # or requirements_Windows_or_Linux.txt for instances that don't use CSI camera
 cp sample_camera_edge_config.yaml camera_edge_config.yaml
 # edit config to match your settings and include the certificates in the working directory if required
 python uploader.py
@@ -137,21 +137,17 @@ Below are the steps needed to deploy and run MVI-Dragonfly with any device
 
 ### Prerequisites
 
-This program is built entirely on Python3.9 and it is recommended that you create a virtual environment
+This program is built entirely on Python3.9. If you are attempting to use a CSI camera on RPI you must install the following before installing the requirements:
 
   ```sh
-  python -m venv [your_virtual_env_name]
-  ```
-**Then activate the virtual environment:**
-
-  _Windows_
-  ```sh
-  .\[your_virtual_env_name]\Scripts\activate
-  ```
+  # Update package list
+  sudo apt update
   
-  _Linux/RPI_
-  ```sh
-  source ./[your_virtual_env_name]/bin/activate
+  # Install libcap development headers
+  sudo apt install libcap-dev
+  
+  # Also install other common build dependencies for Python packages
+  sudo apt install build-essential python3-dev
   ```
 
 
@@ -166,11 +162,26 @@ This program is built entirely on Python3.9 and it is recommended that you creat
    ```sh
    cd ./MVI-Dragonfly
    ```
-3. Install the required packages
+3. Create a virutal environment
    ```sh
-   pip install -r requirements.txt
+    python -m venv [your_virtual_env_name]
+    ```
+  **Then activate the virtual environment:**
+  
+    _Windows_
+    ```sh
+    .\[your_virtual_env_name]\Scripts\activate
+    ```
+    
+    _Linux/RPI_
+    ```sh
+    source ./[your_virtual_env_name]/bin/activate
+    ```
+5. Install the required packages
+   ```sh
+   pip install -r requirements_[your host type].txt #requirements_RPI.txt or requirements_Windows_or_Linux.txt
    ```
-4. Configure your camera_edge_config.yaml (this file must be named identically and in the same directory as uploader.py)    
+6. Configure your camera_edge_config.yaml (this file must be named identically and in the same directory as uploader.py)    
 
   There is a sample yaml available ([sample_camera_edge_config.yaml](https://github.com/SiliconFF/EdgeCamera_MVIUpload/blob/main/sample_camera_edge_config.yaml))
   
