@@ -185,7 +185,10 @@ See the [open issues](https://github.com/SiliconFF/EdgeCamera_MVIUpload/issues) 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Acknowledgements
 
+Thanks to IBM for the Maximo Visual Inspection Edge API that powers this project.  
+This project is unofficial and not endorsed by IBM.
 
 <!-- CONTRIBUTING -->
 ## Contributing
