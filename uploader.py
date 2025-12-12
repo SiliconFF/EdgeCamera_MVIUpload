@@ -104,6 +104,9 @@ mvi_device_uuid = config.get('mvi-device-uuid', '').strip()
 if not mvi_endpoint_base or not mvi_username or not mvi_password:
     logger.error("Missing MVI endpoint or credentials")
     sys.exit(1)
+if not mvi_device_uuid:
+    logger.error("Missing MVI device UUID")
+    sys.exit(1)
 
 # MQTT Config
 mqtt_broker = config.get('mqtt-broker', '').strip()
